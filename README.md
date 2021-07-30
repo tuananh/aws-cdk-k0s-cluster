@@ -5,7 +5,7 @@ aws-cdk-k0s-cluster
 
 This serves purely as an experiment for me to create a test k0s cluster for testing purpose with Graviton spot instances.
 
-This goes against everything practices as I'm provisioning everything in public subnets :D
+This goes against every best practices as I'm provisioning everything in public subnets :D
 
 ## Notes
 
