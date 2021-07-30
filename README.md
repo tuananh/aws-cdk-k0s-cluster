@@ -12,6 +12,12 @@ This goes against everything practices as I'm provisioning everything in public 
 - ETCD_UNSUPPORTED_ARCH=arm64 is needed. See the [issue here](https://github.com/k0sproject/k0s/issues/424).
 
 
+## Getting started
+
+- install cdk cli with `npm install aws-cdk -g`
+- install `projen` with `npm install projen -g`
+- build with `npm run build`
+- test with `npm run test`
 ## Test
 
 You can test this lib by going to `example` folder and then `cdk deploy` from there.
