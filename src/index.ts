@@ -123,7 +123,7 @@ export class Cluster extends cdk.Construct {
       securityGroup: k0sControlPlaneSG,
     });
 
-    // - install controller but it will fail. we then need to insert env var to 
+    // - install controller but it will fail. we then need to insert env var to
     // k0scontroller.service and then restart it
     // - sleep 100, otherwise worker-token will be empty
     k0sControlPlane.addUserData(`

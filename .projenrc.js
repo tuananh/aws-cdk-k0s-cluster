@@ -63,7 +63,7 @@ project.package.addField('resolutions', {
 });
 
 
-const common_exclude = ['cdk.out', 'cdk.context.json', 'images', 'yarn-error.log'];
+const common_exclude = ['cdk.out', 'cdk.context.json', 'images', 'yarn-error.log', 'example/node_modules/'];
 project.npmignore.exclude(...common_exclude);
 project.gitignore.exclude(...common_exclude);
 

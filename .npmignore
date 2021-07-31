@@ -18,6 +18,7 @@
 cdk.context.json
 cdk.out
 dist
+example/node_modules/
 images
 junit.xml
 tsconfig.tsbuildinfo

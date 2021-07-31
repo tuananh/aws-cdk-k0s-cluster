@@ -21,6 +21,7 @@ build/Release
 cdk.context.json
 cdk.out
 coverage
+example/node_modules/
 images
 jspm_packages/
 junit.xml
