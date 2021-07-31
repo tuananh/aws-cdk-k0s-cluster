@@ -123,23 +123,26 @@ export class Cluster extends cdk.Construct {
       securityGroup: k0sControlPlaneSG,
     });
 
+    // sleep 100, otherwise worker-token will be empty
     k0sControlPlane.addUserData(`
-       #!/bin/bash
-       curl -sSLf https://get.k0s.sh | sudo sh
-       /usr/local/bin/k0s default-config > k0s.yaml
-       sudo /usr/local/bin/k0s install controller -c k0s.yaml
-       sudo /usr/local/bin/k0s start
+      #!/bin/bash
+      curl -sSLf https://get.k0s.sh | sudo sh
+      /usr/local/bin/k0s default-config > /k0s.yaml
+      sudo /usr/local/bin/k0s install controller -c /k0s.yaml
+      sed -i '/^[Service]/a Environment="ETCD_UNSUPPORTED_ARCH=arm64"' /etc/systemd/system/k0scontroller.service
+      sudo /usr/local/bin/k0s start
 
-       /usr/local/bin/k0s token create --role=worker --expiry=100h > worker-token
-       aws s3 cp worker-token s3://${k0sBucket.bucketName}/worker-token
-       aws s3 cp /var/lib/k0s/pki/admin.conf s3://${k0sBucket.bucketName}/kubeconfig.yaml
+      sleep 1000
+
+      /usr/local/bin/k0s token create --role=worker --expiry=100h > /worker-token
+      aws s3 cp /worker-token s3://${k0sBucket.bucketName}/worker-token
+      aws s3 cp /var/lib/k0s/pki/admin.conf s3://${k0sBucket.bucketName}/kubeconfig.yaml
      `);
 
 
     this.endpointUri = k0sControlPlane.instancePublicIp;
 
     // create launch template for worker ASG
-    // prepare the userData
     const userData = ec2.UserData.forLinux();
     userData.addCommands(`
           #!/bin/bash
