@@ -123,14 +123,17 @@ export class Cluster extends cdk.Construct {
       securityGroup: k0sControlPlaneSG,
     });
 
-    // sleep 100, otherwise worker-token will be empty
+    // - install controller but it will fail. we then need to insert env var to 
+    // k0scontroller.service and then restart it
+    // - sleep 100, otherwise worker-token will be empty
     k0sControlPlane.addUserData(`
       #!/bin/bash
       curl -sSLf https://get.k0s.sh | sudo sh
       sudo /usr/local/bin/k0s default-config > /k0s.yaml
       sudo /usr/local/bin/k0s install controller -c /k0s.yaml
-      sudo sed -i '/^\[Service\]/a Environment="ETCD_UNSUPPORTED_ARCH=arm64"' /etc/systemd/system/k0scontroller.service
-      sudo /usr/local/bin/k0s start
+      sudo sed -i '/^\\[Service\\]/a Environment="ETCD_UNSUPPORTED_ARCH=arm64"' /etc/systemd/system/k0scontroller.service
+      sudo systemctl daemon-reload && sudo systemctl restart k0scontroller &
+      sleep 100
       sudo /usr/local/bin/k0s token create --role=worker --expiry=100h > /worker-token
       sudo aws s3 cp /worker-token s3://${k0sBucket.bucketName}/worker-token
       sudo aws s3 cp /var/lib/k0s/pki/admin.conf s3://${k0sBucket.bucketName}/kubeconfig.yaml

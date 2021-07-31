@@ -325,20 +325,20 @@ Object {
                 Array [
                   "#!/bin/bash
 
-          #!/bin/bash
-          curl -sSLf https://get.k0s.sh | sudo sh
-          echo the bucket name is ",
+      #!/bin/bash
+      curl -sSLf https://get.k0s.sh | sudo sh
+      echo the bucket name is ",
                   Object {
                     "Ref": "Clusterk0sBucket60960BAD",
                   },
-                  " 
-          aws s3 cp s3://",
+                  "
+      sudo aws s3 cp s3://",
                   Object {
                     "Ref": "Clusterk0sBucket60960BAD",
                   },
-                  "/worker-token /worker-token 
-          sudo k0s install worker --token-file /worker-token
-          sudo k0s start
+                  "/worker-token /worker-token
+      sudo /usr/local/bin/k0s install worker --token-file /worker-token
+      sudo /usr/local/bin/k0s start
     ",
                 ],
               ],
@@ -468,19 +468,19 @@ Object {
               Array [
                 "#!/bin/bash
 
-       #!/bin/bash
-       curl -sSLf https://get.k0s.sh | sudo sh
-       k0s default-config > k0s.yaml
-       sudo k0s install controller -c k0s.yaml
-       sudo k0s start
-
-       k0s token create --role=worker --expiry=100h > worker-token
-       aws s3 cp worker-token s3://",
+      #!/bin/bash
+      curl -sSLf https://get.k0s.sh | sudo sh
+      sudo /usr/local/bin/k0s default-config > /k0s.yaml
+      sudo /usr/local/bin/k0s install controller -c /k0s.yaml
+      sudo sed -i '/^\\\\[Service\\\\]/a Environment=\\"ETCD_UNSUPPORTED_ARCH=arm64\\"' /etc/systemd/system/k0scontroller.service
+      sudo /usr/local/bin/k0s start
+      sudo /usr/local/bin/k0s token create --role=worker --expiry=100h > /worker-token
+      sudo aws s3 cp /worker-token s3://",
                 Object {
                   "Ref": "Clusterk0sBucket60960BAD",
                 },
                 "/worker-token
-       aws s3 cp /var/lib/k0s/pki/admin.conf s3://",
+      sudo aws s3 cp /var/lib/k0s/pki/admin.conf s3://",
                 Object {
                   "Ref": "Clusterk0sBucket60960BAD",
                 },
