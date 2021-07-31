@@ -127,16 +127,16 @@ export class Cluster extends cdk.Construct {
     k0sControlPlane.addUserData(`
       #!/bin/bash
       curl -sSLf https://get.k0s.sh | sudo sh
-      /usr/local/bin/k0s default-config > /k0s.yaml
-      sudo /usr/local/bin/k0s install controller -c /k0s.yaml
-      sed -i '/^[Service]/a Environment="ETCD_UNSUPPORTED_ARCH=arm64"' /etc/systemd/system/k0scontroller.service
-      sudo /usr/local/bin/k0s start
+      sudo /usr/local/bin/k0s default-config > /k0s.yaml
+      sudo /usr/local/bin/k0s install controller -c /k0s.yaml &
+      sleep 30
+      sudo sed -i '/^[Service]/a Environment="ETCD_UNSUPPORTED_ARCH=arm64"' /etc/systemd/system/k0scontroller.service
+      sudo /usr/local/bin/k0s start &
+      sleep 5000
 
-      sleep 1000
-
-      /usr/local/bin/k0s token create --role=worker --expiry=100h > /worker-token
-      aws s3 cp /worker-token s3://${k0sBucket.bucketName}/worker-token
-      aws s3 cp /var/lib/k0s/pki/admin.conf s3://${k0sBucket.bucketName}/kubeconfig.yaml
+      sudo /usr/local/bin/k0s token create --role=worker --expiry=100h > /worker-token
+      sudo aws s3 cp /worker-token s3://${k0sBucket.bucketName}/worker-token
+      sudo aws s3 cp /var/lib/k0s/pki/admin.conf s3://${k0sBucket.bucketName}/kubeconfig.yaml
      `);
 
 
@@ -145,12 +145,12 @@ export class Cluster extends cdk.Construct {
     // create launch template for worker ASG
     const userData = ec2.UserData.forLinux();
     userData.addCommands(`
-          #!/bin/bash
-          curl -sSLf https://get.k0s.sh | sudo sh
-          echo the bucket name is ${k0sBucket.bucketName} 
-          aws s3 cp s3://${k0sBucket.bucketName}/worker-token /worker-token 
-          sudo /usr/local/bin/k0s install worker --token-file /worker-token
-          sudo /usr/local/bin/k0s start
+      #!/bin/bash
+      curl -sSLf https://get.k0s.sh | sudo sh
+      echo the bucket name is ${k0sBucket.bucketName}
+      sudo aws s3 cp s3://${k0sBucket.bucketName}/worker-token /worker-token
+      sudo /usr/local/bin/k0s install worker --token-file /worker-token
+      sudo /usr/local/bin/k0s start
     `);
 
     // create worker ASG
